@@ -93,7 +93,11 @@ public class User {
 	}
 	
 	public boolean setRetweet(Tweet tweet) {
-		return retweets.add(tweet);
+		boolean changed =  retweets.add(tweet);
+		if(changed) {
+			tweet.incrementRetweetCounter();
+		}
+		return changed;
 	}
 
 	public void setRetweets(Set<Tweet> retweets) {

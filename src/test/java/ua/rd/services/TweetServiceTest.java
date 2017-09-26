@@ -3,6 +3,7 @@ package ua.rd.services;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.mockito.AdditionalAnswers.*;
+import static org.mockito.Matchers.any;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,7 @@ import org.junit.Test;
 import ua.rd.domain.Tweet;
 import ua.rd.domain.User;
 import ua.rd.repository.TweetRepository;
+import ua.rd.repository.UserRepository;
 
 public class TweetServiceTest {
 
@@ -67,7 +69,6 @@ public class TweetServiceTest {
 		Iterable<Tweet> result = service.userTimeline(user);
 		int itemCounter = 0;
 		for (Tweet t : result) {
-			System.out.println(t);
 			itemCounter++;
 		}
 		assertEquals(5, itemCounter);
@@ -99,6 +100,74 @@ public class TweetServiceTest {
 		TweetService service = new SimpleTweetService(tweetRepository);
 		Tweet tweet = service.newTweet(user);
 		assertEquals(user, tweet.getUser());
+	}
+	
+	@Test
+	public void retweetCounterTest() {
+		List<Tweet> tweets = new ArrayList<>();
+
+		User retweeter = new User("retweeter");
+		
+		User retweetTarget = new User("retweetTarget");
+		Long TweetId = 0L;
+		Tweet tweet =  new Tweet("", retweetTarget);
+		tweet.setTweetId(TweetId);
+		tweets.add(tweet);
+		
+		TweetRepository tweetRepository = mock(TweetRepository.class);
+		when(tweetRepository.getTweet(TweetId)).thenReturn(Optional.of(tweet));
+		
+		UserRepository userRepository = mock(UserRepository.class);
+		UserService userService = new SimpleUserService(userRepository,tweetRepository);
+		userService.retweet(retweeter, TweetId);
+		assertEquals(1, tweet.getRetweetCounter());
+		
+	}
+	@Test
+	public void repeatedRetweetCounterTest() {
+		List<Tweet> tweets = new ArrayList<>();
+
+		User retweeter = new User("retweeter");
+		
+		User retweetTarget = new User("retweetTarget");
+		Long TweetId = 0L;
+		Tweet tweet =  new Tweet("", retweetTarget);
+		tweet.setTweetId(TweetId);
+		tweets.add(tweet);
+		
+		TweetRepository tweetRepository = mock(TweetRepository.class);
+		when(tweetRepository.getTweet(TweetId)).thenReturn(Optional.of(tweet));
+		
+		UserRepository userRepository = mock(UserRepository.class);
+		UserService userService = new SimpleUserService(userRepository,tweetRepository);
+		userService.retweet(retweeter, TweetId);
+		userService.retweet(retweeter, TweetId);
+		assertEquals(1, tweet.getRetweetCounter());
+		
+	}
+	@Test
+	public void severalUsersRetweetCounterTest() {
+		List<Tweet> tweets = new ArrayList<>();
+
+		User retweeter1 = new User("retweeter1");
+		User retweeter2 = new User("retweeter2");
+		
+		User retweetTarget = new User("retweetTarget");
+		
+		Long TweetId = 0L;
+		Tweet tweet =  new Tweet("", retweetTarget);
+		tweet.setTweetId(TweetId);
+		tweets.add(tweet);
+		
+		TweetRepository tweetRepository = mock(TweetRepository.class);
+		when(tweetRepository.getTweet(TweetId)).thenReturn(Optional.of(tweet));
+		
+		UserRepository userRepository = mock(UserRepository.class);
+		UserService userService = new SimpleUserService(userRepository,tweetRepository);
+		userService.retweet(retweeter1, TweetId);
+		userService.retweet(retweeter2, TweetId);
+		assertEquals(2, tweet.getRetweetCounter());
+		
 	}
 	
 }

@@ -1,49 +1,49 @@
 package ua.rd.domain;
 
 public class Tweet {
-	
-    private Long tweetId;
-    private String txt;
-    private User user;
-    private long likeCounter;
-    private long maxTextLength;
 
-    public Tweet() {
-    	
-    }
+	private Long tweetId;
+	private String txt;
+	private User user;
+	private long likeCounter;
+	private long retweetCounter;
+	private long maxTextLength;
 
-    public Tweet(String txt, User user) {
-        setTxt(txt);
-        this.user = user;
-    }
+	public Tweet() {
 
-    public Long getTweetId() {
-        return tweetId;
-    }
+	}
 
-    public void setTweetId(Long tweetId) {
-        this.tweetId = tweetId;
-    }
+	public Tweet(String txt, User user) {
+		setTxt(txt);
+		this.user = user;
+	}
 
-    public String getTxt() {
-        return txt;
-    }
+	public Long getTweetId() {
+		return tweetId;
+	}
 
-    public void setTxt(String txt) {
-    	if(txt.length()<=maxTextLength) {
-    		this.txt = txt;
-    	}
-    }
+	public void setTweetId(Long tweetId) {
+		this.tweetId = tweetId;
+	}
 
-    public User getUser() {
-        return user;
-    }
+	public String getTxt() {
+		return txt;
+	}
 
-    public void setUser(User user) {
-        this.user = user;
-    }
+	public void setTxt(String txt) {
+		if (txt.length() <= maxTextLength) {
+			this.txt = txt;
+		}
+	}
 
-   
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
 	public Long getLikeCounter() {
 		return likeCounter;
 	}
@@ -51,11 +51,33 @@ public class Tweet {
 	public void like() {
 		this.likeCounter++;
 	}
+
 	public void dislike() {
 		this.likeCounter--;
 	}
-	
-	 @Override
+
+	public long getMaxTextLength() {
+		return maxTextLength;
+	}
+
+	public void setMaxTextLength(long maxTextLength) {
+		this.maxTextLength = maxTextLength;
+	}
+
+	public void addRetweeter(User retweeter) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public long getRetweetCounter() {
+		return retweetCounter;
+	}
+
+	void incrementRetweetCounter() {
+		retweetCounter++;
+	}
+
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -81,25 +103,8 @@ public class Tweet {
 	}
 
 	@Override
-	    public String toString() {
-	        return "Tweet{" +
-	                "tweetId=" + tweetId +
-	                ", txt='" + txt + '\'' +
-	                ", user=" + user.getName() +
-	                '}';
-	    }
-
-	public long getMaxTextLength() {
-		return maxTextLength;
-	}
-
-	public void setMaxTextLength(long maxTextLength) {
-		this.maxTextLength = maxTextLength;
-	}
-
-	public void addRetweeter(User retweeter) {
-		// TODO Auto-generated method stub
-		
+	public String toString() {
+		return "Tweet{" + "tweetId=" + tweetId + ", txt='" + txt + '\'' + ", user=" + user.getName() + '}';
 	}
 
 }
