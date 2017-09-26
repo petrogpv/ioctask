@@ -69,6 +69,7 @@ public class TweetServiceTest {
 		Iterable<Tweet> result = service.userTimeline(user);
 		int itemCounter = 0;
 		for (Tweet t : result) {
+			System.out.println(t);
 			itemCounter++;
 		}
 		assertEquals(5, itemCounter);
