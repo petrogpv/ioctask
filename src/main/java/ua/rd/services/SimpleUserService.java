@@ -9,8 +9,8 @@ import ua.rd.repository.UserRepository;
 
 public class SimpleUserService implements UserService {
 
-	UserRepository userRepository;
-	TweetRepository tweetRepository;
+	private UserRepository userRepository;
+	private TweetRepository tweetRepository;
 
 	SimpleUserService(UserRepository userRepository) {
 		this.userRepository = userRepository;

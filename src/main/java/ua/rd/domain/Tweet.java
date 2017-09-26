@@ -19,11 +19,11 @@ public class Tweet {
 	}
 
 	public Long getTweetId() {
-		return tweetId;
+		return tweetId==null? null: new Long(tweetId);
 	}
 
 	public void setTweetId(Long tweetId) {
-		this.tweetId = tweetId;
+		this.tweetId = new Long(tweetId);
 	}
 
 	public String getTxt() {
@@ -104,7 +104,11 @@ public class Tweet {
 
 	@Override
 	public String toString() {
-		return "Tweet{" + "tweetId=" + tweetId + ", txt='" + txt + '\'' + ", user=" + user.getName() + '}';
+		return "Tweet{" + "tweetId=" + tweetId + 
+				", txt='" + txt + '\'' + 
+				", author=" + user.getName() + 
+				", likes=" + likeCounter + 
+				'}';
 	}
 
 }

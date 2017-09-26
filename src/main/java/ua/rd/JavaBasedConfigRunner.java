@@ -21,25 +21,28 @@ public class JavaBasedConfigRunner {
 		
 		UserService userService = serviceContext.getBean(UserService.class);
 		TweetService tweetService = serviceContext.getBean(TweetService.class);
-		User user1 = userService.createNewUser("user1");
-		tweetService.newTweet(user1);
-		tweetService.newTweet(user1);
-		System.out.println(tweetService.allUsersTweets(user1));
-		User user2 = userService.createNewUser("user2");
-		tweetService.newTweet(user2);
-		tweetService.newTweet(user2);
-		User user3 = userService.createNewUser("user3");
-		tweetService.newTweet(user3);
-		tweetService.newTweet(user3);
+		User currentUser = userService.saveUser(userService.createNewUser("user1"));
 		
-		user1.subscribe(user2);
-		System.out.println(tweetService.userTimeline(user1));
-		for(Tweet tweet :tweetService.userTimeline(user1)) {
+		
+		tweetService.newTweet(currentUser);
+		tweetService.newTweet(currentUser);
+		System.out.println(tweetService.allUsersTweets(currentUser));
+		
+		User user2 = userService.saveUser(userService.createNewUser("user2"));
+		tweetService.newTweet(user2);
+		tweetService.newTweet(user2);
+		User user3 = userService.saveUser(userService.createNewUser("user3"));
+		tweetService.newTweet(user3);
+		Tweet targetTweet = tweetService.newTweet(user3);
+		
+		userService.createSubscription(currentUser, user2.getId());
+		userService.retweet(user2, targetTweet.getTweetId());
+		
+		System.out.println(tweetService.userTimeline(currentUser));
+		for(Tweet tweet :tweetService.userTimeline(currentUser)) {
 			tweetService.likeTweet(tweet.getTweetId());
 		}
-		for(Tweet tweet :tweetService.userTimeline(user1)) {
-			System.out.println(tweet.getLikeCounter());
-		}
 		
+		System.out.println(tweetService.userTimeline(currentUser));
 	}
 }
