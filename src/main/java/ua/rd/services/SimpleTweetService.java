@@ -12,7 +12,6 @@ import ua.rd.domain.Tweet;
 import ua.rd.domain.User;
 import ua.rd.repository.TweetRepository;
 
-@Service("tweetService")
 public class SimpleTweetService implements TweetService {
 
 	private TweetRepository tweetRepository;
@@ -34,8 +33,6 @@ public class SimpleTweetService implements TweetService {
 		return tweetRepository.save(tweet);
 		 
 	}
-	
-	
 	
 	@Override
 	public Tweet createNewTweet() {
@@ -64,6 +61,7 @@ public class SimpleTweetService implements TweetService {
 		Optional<Tweet> tweet = tweetRepository.getTweet(tweetId);
 		return tweet.map(item -> {
 			item.like();
+			tweetRepository.save(item);
 			return true;
 		}).orElse(false);
 	}
