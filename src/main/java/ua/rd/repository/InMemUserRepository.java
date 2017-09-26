@@ -3,6 +3,7 @@ package ua.rd.repository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import ua.rd.domain.User;
@@ -29,8 +30,8 @@ public class InMemUserRepository implements UserRepository {
 	}
 
 	@Override
-	public User get(Long userId) {
-		return userRepo.get(userId);
+	public Optional<User> get(Long userId) {
+		return Optional.ofNullable(userRepo.get(userId));
 	}
 
 	@Override

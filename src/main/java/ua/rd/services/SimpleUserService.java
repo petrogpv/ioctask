@@ -27,8 +27,9 @@ public class SimpleUserService implements UserService {
 	}
 
 	@Override
-	public User getUser(Long id) {
+	public Optional<User> getUser(Long id) {
 		return userRepository.get(id);
+
 	}
 
 	@Override
@@ -38,23 +39,25 @@ public class SimpleUserService implements UserService {
 
 	@Override
 	public boolean createSubscription(User subscriber, Long targetUserId) {
-		User targetUser = getUser(targetUserId);
-		boolean chenged = subscriber.subscribe(targetUser);
-		if (chenged) {
-			saveUser(subscriber);
-		}
-		return chenged;
+		Optional<User> targetUser = getUser(targetUserId);
+		return targetUser.map(user -> {
+			boolean changed = subscriber.subscribe(user);
+			if (changed) {
+				saveUser(subscriber);
+			}
+			return changed;
+		}).orElse(false);
 	}
 
 	@Override
 	public boolean retweet(User retweeter, Long tweetId) {
 		Optional<Tweet> targetTweet = tweetRepository.getTweet(tweetId);
 		return targetTweet.map(tweet -> {
-			boolean chenged = retweeter.setRetweet(tweet);
-			if (chenged) {
+			boolean changed = retweeter.setRetweet(tweet);
+			if (changed) {
 				saveUser(retweeter);
 			}
-			return chenged;
+			return changed;
 		}).orElse(false);
 	}
 }

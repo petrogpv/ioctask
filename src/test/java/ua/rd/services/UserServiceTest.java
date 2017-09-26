@@ -73,29 +73,35 @@ public class UserServiceTest {
 	@Test
 	public void addSubsciptionTest() {
 		User target = new User();
-		target.setId(1L);
+		Long targetId = 1L;
+		target.setId(targetId);
 		
 		UserRepository userRepository = mock(UserRepository.class);
 		when(userRepository.save(any(User.class))).thenReturn(target);
+		when(userRepository.get(targetId)).thenReturn(Optional.of(target));
+
 		
 		UserService userService = new SimpleUserService(userRepository);
 		User subscriber = new User();
-		userService.createSubscription(subscriber,1L);
+		userService.createSubscription(subscriber,targetId);
 		verify(userRepository, times(1)).save(subscriber);
 		assertEquals(1, subscriber.getSubscriptions().size());
 	}
 	@Test
 	public void addExistingSubsciptionTest() {
 		User target = new User();
-		target.setId(1L);
+		Long targetId = 1L;
+		target.setId(targetId);
 		
 		UserRepository userRepository = mock(UserRepository.class);
 		when(userRepository.save(any(User.class))).thenReturn(target);
+		when(userRepository.get(targetId)).thenReturn(Optional.of(target));
 		UserService userService = new SimpleUserService(userRepository);
 		
+		
 		User subscriber = new User();
-		userService.createSubscription(subscriber,1L);
-		boolean result =userService.createSubscription(subscriber,1L);
+		userService.createSubscription(subscriber,targetId);
+		boolean result =userService.createSubscription(subscriber,targetId);
 		verify(userRepository, times(1)).save(any(User.class));
 		assertFalse(result);
 	}
