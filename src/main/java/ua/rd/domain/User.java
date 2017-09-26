@@ -1,15 +1,15 @@
 package ua.rd.domain;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class User {
 
 	private Long id;
-	private List<Tweet> tweets = new ArrayList<>();
+	
+	
 	private Set<User> subscriptions = new HashSet<>();
+	
 	private Set<Tweet> retweets = new HashSet<>();
 
 	private String name;
@@ -27,9 +27,6 @@ public class User {
 
 	}
 
-	public void setTweet(List<Tweet> tweets) {
-		this.tweets = tweets;
-	}
 
 	public Long getId() {
 		return id;
@@ -88,7 +85,7 @@ public class User {
 
 	@Override
 	public String toString() {
-		return "User{" + "tweets=" + tweets + ", name='" + name + '\'' + '}';
+		return "User{ name='" + name + '}';
 	}
 
 	public Set<Tweet> getRetweets() {
