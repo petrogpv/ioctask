@@ -21,19 +21,19 @@ public class JavaBasedConfigRunner {
 		
 		UserService userService = serviceContext.getBean(UserService.class);
 		TweetService tweetService = serviceContext.getBean(TweetService.class);
-		User currentUser = userService.saveUser(userService.createNewUser("user1"));
+		User currentUser = userService.saveUser(userService.newUser("user1"));
 		
 		
-		tweetService.newTweet(currentUser);
-		tweetService.newTweet(currentUser);
+		tweetService.createTweet(currentUser);
+		tweetService.createTweet(currentUser);
 		System.out.println(tweetService.allUsersTweets(currentUser));
 		
-		User user2 = userService.saveUser(userService.createNewUser("user2"));
-		tweetService.newTweet(user2);
-		tweetService.newTweet(user2);
-		User user3 = userService.saveUser(userService.createNewUser("user3"));
-		tweetService.newTweet(user3);
-		Tweet targetTweet = tweetService.newTweet(user3);
+		User user2 = userService.saveUser(userService.newUser("user2"));
+		tweetService.createTweet(user2);
+		tweetService.createTweet(user2);
+		User user3 = userService.saveUser(userService.newUser("user3"));
+		tweetService.createTweet(user3);
+		Tweet targetTweet = tweetService.createTweet(user3);
 		
 		userService.createSubscription(currentUser, user2.getId());
 		userService.retweet(user2, targetTweet.getTweetId());

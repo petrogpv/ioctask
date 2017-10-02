@@ -11,25 +11,41 @@ import java.util.Optional;
 
 import org.junit.Test;
 
-import ua.rd.domain.Tweet;
-import ua.rd.domain.User;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import ua.rd.config.RepoConfig;
+import ua.rd.config.ServiceConfig;
+import ua.rd.config.TimelineConfigurer;
+import ua.rd.domain.*;
 import ua.rd.repository.TweetRepository;
 import ua.rd.repository.UserRepository;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+//@ContextConfiguration(classes = {ServiceConfig.class, RepoConfig.class})
+@ContextConfiguration(locations = { "classpath:config.xml" })
 public class TweetServiceTest {
+
+	@Autowired
+	TweetService tweetService;
+	@Autowired
+	UserService userService;
+	@Autowired
+	TimelineConfigurer timelineConfigurer;
 
 	@Test
 	public void getUserTweetsTest() {
-		User user = new User("aaa");
+		User user = userService.newUser("aaa");
 		List<Tweet> tweets = new ArrayList<>();
-		tweets.add(new Tweet("", user));
-		tweets.add(new Tweet("", user));
-		tweets.add(new Tweet("", user));
-		User otherUser = new User("bbb");
-		tweets.add(new Tweet("", otherUser));
+		tweets.add(tweetService.createTweet(user));
+		tweets.add(tweetService.createTweet(user));
+		tweets.add(tweetService.createTweet(user));
+		User otherUser = userService.newUser("bbb");
+		tweets.add(tweetService.createTweet(otherUser));
 
 		TweetRepository tweetRepository = mock(TweetRepository.class);
-		TweetService service = new SimpleTweetService(tweetRepository);
+		TweetService service = new SimpleTweetService(tweetRepository, timelineConfigurer);
 		when(tweetRepository.allTweets()).thenReturn(tweets);
 		Iterable<Tweet> result = service.allUsersTweets(user);
 		int itemCounter = 0;
@@ -41,30 +57,33 @@ public class TweetServiceTest {
 
 	@Test
 	public void getUserTimelineTest() {
-		User user = new User("user");
+		User user = userService.newUser("user");
 		List<Tweet> tweets = new ArrayList<>();
-		tweets.add(new Tweet("", user));
-		tweets.add(new Tweet("", user));
-		tweets.add(new Tweet("", user));
-		
-		User otherUser = new User("otherUser");
-		tweets.add(new Tweet("", otherUser));
+		tweets.add(tweetService.createTweet(user));
+		tweets.add(tweetService.createTweet(user));
+		tweets.add(tweetService.createTweet(user));
+
+
+		User otherUser = userService.newUser("otherUser");
+		tweets.add(tweetService.createTweet(otherUser));
+
 		user.subscribe(otherUser);
 		
-		User yetAnotherUser = new User("yetAnotherUser");
-		Tweet tweet =new Tweet("", yetAnotherUser);
+		User anotherUser = userService.newUser("anotherUser");
+		Tweet tweet = tweetService.createTweet(anotherUser);
 		tweet.setTweetId(4L);
 		tweets.add(tweet);
 		
 		otherUser.setRetweet(tweet);
 		
-		User leftUser = new User("leftUser");
-		tweets.add(new Tweet("", leftUser));
-		tweets.add(new Tweet("", leftUser));
-		tweets.add(new Tweet("", leftUser));
-		
+		User leftUser = userService.newUser("leftUser");
+		tweets.add(tweetService.createTweet(leftUser));
+		tweets.add(tweetService.createTweet(leftUser));
+		tweets.add(tweetService.createTweet(leftUser));
+
+
 		TweetRepository tweetRepository = mock(TweetRepository.class);
-		TweetService service = new SimpleTweetService(tweetRepository);
+		TweetService service = new SimpleTweetService(tweetRepository, timelineConfigurer);
 		when(tweetRepository.allTweets()).thenReturn(tweets);
 		Iterable<Tweet> result = service.userTimeline(user);
 		int itemCounter = 0;
@@ -77,16 +96,17 @@ public class TweetServiceTest {
 
 	@Test
 	public void likeTweetTest() {
-		Tweet tweet = new Tweet("", new User());
+
+		Tweet tweet =tweetService.createTweet(userService.newUser(null));
 
 		TweetRepository tweetRepository = mock(TweetRepository.class);
 		when(tweetRepository.getTweet(0L)).thenReturn(Optional.of(tweet));
 
-		TweetService service = new SimpleTweetService(tweetRepository);
-		Long teweetId = 0L;
+		TweetService service = new SimpleTweetService(tweetRepository, timelineConfigurer);
+		Long tweetId = 0L;
 		long oldLikeCount = tweet.getLikeCounter();
 		
-		service.likeTweet(teweetId);
+		service.likeTweet(tweetId);
 		
 		long newLikeCount = tweet.getLikeCounter();
 		long diff = newLikeCount - oldLikeCount;
@@ -98,8 +118,8 @@ public class TweetServiceTest {
 		User user = new User("aaa");
 		TweetRepository tweetRepository = mock(TweetRepository.class);
 		when(tweetRepository.save(any(Tweet.class))).then(returnsFirstArg());
-		TweetService service = new SimpleTweetService(tweetRepository);
-		Tweet tweet = service.newTweet(user);
+		tweetService.setTweetRepository(tweetRepository);
+		Tweet tweet = tweetService.createTweet(user);
 		assertEquals(user, tweet.getUser());
 	}
 	
@@ -107,11 +127,11 @@ public class TweetServiceTest {
 	public void retweetCounterTest() {
 		List<Tweet> tweets = new ArrayList<>();
 
-		User retweeter = new User("retweeter");
+		User retweeter = userService.newUser("retweeter");
 		
-		User retweetTarget = new User("retweetTarget");
+		User retweetTarget = userService.newUser("retweetTarget");
 		Long TweetId = 0L;
-		Tweet tweet =  new Tweet("", retweetTarget);
+		Tweet tweet =  tweetService.createTweet(retweetTarget);
 		tweet.setTweetId(TweetId);
 		tweets.add(tweet);
 		
@@ -119,20 +139,21 @@ public class TweetServiceTest {
 		when(tweetRepository.getTweet(TweetId)).thenReturn(Optional.of(tweet));
 		
 		UserRepository userRepository = mock(UserRepository.class);
-		UserService userService = new SimpleUserService(userRepository,tweetRepository);
+		UserService userService = new SimpleUserService(userRepository, tweetRepository);
 		userService.retweet(retweeter, TweetId);
 		assertEquals(1, tweet.getRetweetCounter());
 		
 	}
 	@Test
 	public void repeatedRetweetCounterTest() {
+
 		List<Tweet> tweets = new ArrayList<>();
 
 		User retweeter = new User("retweeter");
 		
 		User retweetTarget = new User("retweetTarget");
 		Long TweetId = 0L;
-		Tweet tweet =  new Tweet("", retweetTarget);
+		Tweet tweet =  tweetService.createTweet(retweetTarget);
 		tweet.setTweetId(TweetId);
 		tweets.add(tweet);
 		
@@ -140,7 +161,7 @@ public class TweetServiceTest {
 		when(tweetRepository.getTweet(TweetId)).thenReturn(Optional.of(tweet));
 		
 		UserRepository userRepository = mock(UserRepository.class);
-		UserService userService = new SimpleUserService(userRepository,tweetRepository);
+		UserService userService = new SimpleUserService(userRepository, tweetRepository);
 		userService.retweet(retweeter, TweetId);
 		userService.retweet(retweeter, TweetId);
 		assertEquals(1, tweet.getRetweetCounter());
@@ -156,7 +177,7 @@ public class TweetServiceTest {
 		User retweetTarget = new User("retweetTarget");
 		
 		Long TweetId = 0L;
-		Tweet tweet =  new Tweet("", retweetTarget);
+		Tweet tweet =  tweetService.createTweet(retweetTarget);
 		tweet.setTweetId(TweetId);
 		tweets.add(tweet);
 		
@@ -164,7 +185,7 @@ public class TweetServiceTest {
 		when(tweetRepository.getTweet(TweetId)).thenReturn(Optional.of(tweet));
 		
 		UserRepository userRepository = mock(UserRepository.class);
-		UserService userService = new SimpleUserService(userRepository,tweetRepository);
+		UserService userService = new SimpleUserService(userRepository, tweetRepository);
 		userService.retweet(retweeter1, TweetId);
 		userService.retweet(retweeter2, TweetId);
 		assertEquals(2, tweet.getRetweetCounter());

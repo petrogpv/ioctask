@@ -1,5 +1,10 @@
 package ua.rd.domain;
 
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+//@Component("tweet")
+//@Scope("prototype")
 public class Tweet {
 
 	private Long tweetId;
@@ -9,13 +14,9 @@ public class Tweet {
 	private long retweetCounter;
 	private long maxTextLength;
 
-	public Tweet() {
+	public Tweet(Long maxTextLength) {
+		this.maxTextLength = maxTextLength;
 
-	}
-
-	public Tweet(String txt, User user) {
-		setTxt(txt);
-		this.user = user;
 	}
 
 	public Long getTweetId() {
@@ -62,11 +63,6 @@ public class Tweet {
 
 	public void setMaxTextLength(long maxTextLength) {
 		this.maxTextLength = maxTextLength;
-	}
-
-	public void addRetweeter(User retweeter) {
-		// TODO Auto-generated method stub
-
 	}
 
 	public long getRetweetCounter() {

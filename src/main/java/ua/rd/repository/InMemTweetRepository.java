@@ -16,10 +16,9 @@ import java.util.stream.Collectors;
 @Repository("tweetRepository")
 public class InMemTweetRepository implements TweetRepository {
 	private static Long idCounter = Long.valueOf(0);
-	private Map<Long, Tweet> tweets;
+	private Map<Long, Tweet> tweets = new HashMap<>() ;
 
-	public InMemTweetRepository(Map<Long, Tweet> tweets) {
-		this.tweets = tweets;
+	public InMemTweetRepository() {
 	}
 
 	@Override

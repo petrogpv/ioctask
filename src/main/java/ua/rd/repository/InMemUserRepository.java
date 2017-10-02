@@ -10,11 +10,9 @@ import ua.rd.domain.User;
 
 public class InMemUserRepository implements UserRepository {
 	private static Long idCounter = Long.valueOf(0);
-	private Map<Long,User> userRepo;
+	private Map<Long,User> userRepo = new HashMap<>();
 	
-	public InMemUserRepository(Map<Long,User> userRepo){
-		this.userRepo=userRepo;
-	}
+	public InMemUserRepository(){}
 	@Override
 	public User save(User user) {
 		if(user.getId()==null) {

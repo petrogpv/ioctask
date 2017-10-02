@@ -2,6 +2,7 @@ package ua.rd.services;
 
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Lookup;
 import ua.rd.domain.Tweet;
 import ua.rd.domain.User;
 import ua.rd.repository.TweetRepository;
@@ -20,7 +21,10 @@ public class SimpleUserService implements UserService {
 		this.userRepository = userRepository;
 		this.tweetRepository = tweetRepository;
 	}
-
+	@Override
+	public void setUserRepository(UserRepository userRepository) {
+		this.userRepository = userRepository;
+	}
 	@Override
 	public User saveUser(User user) {
 		return userRepository.save(user);
@@ -29,13 +33,20 @@ public class SimpleUserService implements UserService {
 	@Override
 	public Optional<User> getUser(Long id) {
 		return userRepository.get(id);
-
 	}
 
 	@Override
-	public User createNewUser(String name) {
-		return new User(name);
+	public User newUser(String name) {
+		User user = newUser();
+		user.setName(name);
+		return user;
 	}
+	@Lookup
+	public User newUser() {
+		System.out.println("newUser: I should not be here");
+		return null;
+	}
+
 
 	@Override
 	public boolean createSubscription(User subscriber, Long targetUserId) {
@@ -60,4 +71,7 @@ public class SimpleUserService implements UserService {
 			return changed;
 		}).orElse(false);
 	}
+
+
+
 }

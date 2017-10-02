@@ -1,15 +1,13 @@
 package ua.rd.services;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.BiPredicate;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.springframework.stereotype.Service;
-
+import org.springframework.beans.factory.annotation.Lookup;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.stereotype.Component;
 import ua.rd.config.TimelineConfigurer;
 import ua.rd.domain.Tweet;
 import ua.rd.domain.User;
@@ -18,19 +16,18 @@ import ua.rd.repository.TweetRepository;
 public class SimpleTweetService implements TweetService {
 
 	private TweetRepository tweetRepository;
-	private BiPredicate<Tweet,User> timelineConfig;
+	private TimelineConfigurer timelineConfigurer;
 	
-	public SimpleTweetService(TweetRepository tweetRepository,BiPredicate<Tweet,User> timelineConfig) {
-		this.tweetRepository=tweetRepository;
-		this.timelineConfig=timelineConfig;
+	public SimpleTweetService(TweetRepository tweetRepository,
+							 TimelineConfigurer timelineConfigurer) {
+		this.tweetRepository = tweetRepository;
+		this.timelineConfigurer = timelineConfigurer;
 	}
-	
-	//for tests
-	SimpleTweetService(TweetRepository tweetRepository){
-		this.tweetRepository=tweetRepository;
-		this.timelineConfig= new TimelineConfigurer().getDefaultConfig();
+
+	public void setTweetRepository(TweetRepository tweetRepository) {
+		this.tweetRepository = tweetRepository;
 	}
-	
+
 	@Override
 	public Iterable<Tweet> allUsersTweets(User user) {
 		Collection<Tweet> tweets = tweetRepository.allTweets();
@@ -38,23 +35,24 @@ public class SimpleTweetService implements TweetService {
 	}
 
 	@Override
-	public Tweet newTweet(User user) {
-		Tweet tweet = createNewTweet();
+	public Tweet createTweet(User user) {
+		Tweet tweet = newTweet();
 		tweet.setUser(user);
 		return tweetRepository.save(tweet);
 		 
 	}
-	
-	@Override
-	public Tweet createNewTweet() {
-		return new Tweet();
+
+	@Lookup
+	protected Tweet newTweet(){
+		System.out.println("newTweet: I should not be here");
+		return null;
 	}
 
 	@Override
 	public Iterable<Tweet> userTimeline(User user) {
 		Collection<Tweet> tweets = tweetRepository.allTweets();
 		return tweets.stream()
-				.filter(tweet->timelineConfig.test(tweet,user) )
+				.filter(tweet->timelineConfigurer.getDefaultConfig().test(tweet,user) )
 				.collect(Collectors.toList());
 	}
 
